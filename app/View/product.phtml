@@ -1,0 +1,123 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-6"><h3>Welcome, <?= ucwords($username)?>!</h3></div>
+            <div class="col-md-6" align="right">
+            <a type="button" name="log_out" id="log_out" class="btn btn-success btn-lg" href="product/logoff">Logout</a>
+            </div>
+        </div>
+	<div class = "row">
+		<div class="alert alert-success col-md-4">
+		<span> Your balance is: $<?= $balance ?></span>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-6"><h3><b>Our Products</b></h3></div>
+	</div>
+
+	<table>
+	<?php foreach ($products as $product): 
+			$productRate = Rating::getByProductIdAndUserId($product['id'],$_SESSION['user']['id']);
+			$averageRate = Rating::getAverageRating($product['id']);
+			$isRated = null  !== $productRate ? 1 : 0;
+			$rate = null !== $productRate ?  $productRate->getRate() : 0;
+	?>
+	<tr>
+	<td>
+		<div class="container">	
+			<div class = "row>"
+			<div class="col-md-8">
+				<div class="product col-md-6 service-image-left">
+				
+					<center>
+						<img id="item-display" src="<?= $product['image'] ?>" alt=""></img>
+					</center>
+				</div>
+				
+				<div class="container service1-items col-sm-2 col-md-2 pull-left">
+					<center>
+						<a id="item-1" class="service1-item">
+							<img src="<?= $product['image'] ?>" alt=""></img>
+						</a>
+						<a id="item-2" class="service1-item">
+							<img src="<?= $product['image'] ?>" alt=""></img>
+						</a>
+						<a id="item-3" class="service1-item">
+							<img src="<?= $product['image'] ?>" alt=""></img>
+						</a>
+					</center>
+				</div>
+
+				<div class="col-md-7>
+					<div class="product-title"><?= $product['name'] ?></div>
+                    <div class="product-rating">
+			
+					<form id="form-rate-<?= $product['id'] ?>" method="POST" action="/rating/rate">
+						<div class="form-group">
+							<button type="button" class="btn <?php if (1 == $rate) {?> btn-warning <?php } else { ?> btn-default <?php } ?> btn-sm rateButton" 
+							aria-label="Left Align" onclick="rateProduct(1, <?= $product['id'] ?>, <?= $isRated ?>)">
+								<i class="fa fa-star-o"></i>
+							</button>
+							<button type="button" class="btn <?php if (2 == $rate) { ?> btn-warning <?php } else { ?> btn-default <?php } ?> btn-sm rateButton" 
+							aria-label="Left Align" onclick="rateProduct(2, <?= $product['id'] ?>, <?= $isRated ?>)">
+								<i class="fa fa-star-o"></i>
+							</button> 
+							<button type="button" class="btn <?php if (3 == $rate) {?> btn-warning <?php } else { ?> btn-default <?php } ?> btn-sm rateButton" 
+							aria-label="Left Align" onclick="rateProduct(3, <?= $product['id'] ?>, <?= $isRated ?>)">
+								<i class="fa fa-star-o"></i>
+							</button>
+							<button type="button" class="btn <?php if (4 == $rate) {?> btn-warning <?php } else { ?> btn-default <?php } ?> btn-sm rateButton" 
+							aria-label="Left Align" onclick="rateProduct(4, <?= $product['id'] ?>, <?= $isRated ?>)">
+								<i class="fa fa-star-o"></i>
+							</button> 
+							<button type="button" class="btn <?php if (5 == $rate) {?> btn-warning <?php } else { ?> btn-default <?php } ?> btn-sm rateButton" 
+							aria-label="Left Align" onclick="rateProduct(5, <?= $product['id'] ?>, <?= $isRated ?>)">
+								<i class="fa fa-star-o"></i>
+							</button>
+							<input type="hidden" class="form-control" name="rate" id="rate-<?= $product['id'] ?>">
+							<input type="hidden" class="form-control" name="product" value="<?= $product['id'] ?>">
+							<h6><strong>Average Rating: <span><?= $averageRate ?></span></strong></h6>
+						</div>
+					</form>
+					
+				</div>
+					<div class="product-price">$<?= $product['price'] ?></div>
+					<div class="product-stock">In Stock</div>
+					<hr>
+					<div class="btn-group cart">
+						<a  class="addToCart btn btn-success"  href = "/ajax/add/<?= $product['id'] ?>">
+							Add to cart 
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	</td>
+	</tr>
+	<?php  endforeach ?>
+	</table>
+
+	<div class="row">
+		</div class="col-md-12">
+		<br/><a style="float:right; margin-bottom:10px;" type ="button" class="btn btn-success btn-md" name="goto_cart" href="/cart" title="go to Cart"><strong><h4>Go to Cart</h4></strong></a>
+		</div>
+	</div>
+</div><!--container-->
+<script>
+$( document ).ready(function(){
+	$("a.addToCart").on("click",function(e){
+		e.preventDefault();
+		$.ajax({
+			type: "POST",
+			url: $(this).attr("href")
+		})
+		.done(function()
+		{
+			alert ("Product have been added.");
+		});
+
+	});
+
+});
+</script>

@@ -1,0 +1,66 @@
+<div class="container">
+		    <h3><?= ucwords($username) ?>'s Shopping Cart</h3>
+
+		    <div class="table-responsive">
+		    <table class="table"  id="res">
+			    <tr>
+			    	<td></td>
+				    <td class="active"><b>Product</b></td>
+				    <td class="active"><b>Quantity</b></td>
+				    <td class="active"><b>Total</b></td>
+			    </tr>
+			    <?php 
+                foreach ($cartproducts as $product):
+			    ?>
+					<tr id="product-row-<?= $product['id'] ?>">
+					<td><img src="<?= $product['image'] ?>"></td>
+					<td><?= $product['name'] ?></td>
+					<td><input type="text" id="quantity-<?= $product['id'] ?>" onkeyup="calculateTotal(<?= $product['id'] ?>, <?= $product['price'] ?>)"/></td>
+					<td id="total-<?= $product['id'] ?>" class="total"><?= $product['price'] ?></td>
+					<td><a class="removeFromCart text-primary" style="cursor: pointer" onclick="removeFromCart(<?= $product['id'] ?>)"><strong>remove product</strong></a></td>
+				</tr>
+                <?php endforeach ?>
+		    </table>
+            </div>
+		    <div class="alert alert-success">
+                Your previous balance is: $<span id="prevBalance"><?= $balance ?> </span><br/>
+                Your purchase price is:	$<span id="totalPur"></span><br/>		
+                Your total purchase cost is: $<span id="overallCost"></span><br/>	
+                Your remaining balance will be: $<span id="newBalance"></span><br/>	
+		    </div>
+	
+    
+	        <div>
+                <select name="dropDown" onchange="addShipping()" id="shipcost">
+        	        <option value="-1">None</option>
+                    <option value="0">Free Shipping ($0)</option>
+                    <option value="5">Paid Shipping ($5)</option>
+                </select>
+            </div>
+		
+		    <br />
+            <a href="/product" title="go back to products"><strong>Go back to products</strong></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <!-- <a href="javascript:void(0);" class="emptyCart" title="empty cart"><strong>Empty cart</strong></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -->
+	
+            <form id="paymentForm" method="post" action="/payment/paynow">
+			    <input type="hidden" class="form-control" name="new-balance" id="newBalanceInput" value="<?= $newbalance ?>"/>
+			    <br/>
+			    <a type= "button" onclick="submit()" id= "payNow" class="btn btn-success">Pay Now</a>
+		    </form>
+           </div>
+<script>
+	function removeFromCart(product_id){
+		$.ajax({
+			type: "POST",
+			url: 'ajax/remove/' + product_id,
+			success: function(res){
+				if(res.status == 1){
+					$('#product-row-' + product_id).remove();
+					alert('Product removed from cart');
+					getAllTotal();
+                    addShipping();
+			   }
+		    }
+		});
+	}
+</script>
